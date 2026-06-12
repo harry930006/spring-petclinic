@@ -1,0 +1,7 @@
+services:
+  jenkins:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - CASC_JENKINS_CONFIG=/var/jenkins_casc_configs/jenkins.yaml

@@ -1,0 +1,29 @@
+jenkins:
+  systemMessage: "Practice for maven build and jenkins pipeline"
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "admin"
+  authorizationStrategy:
+    rolebased:
+      roles:
+        global:
+          - name: "admin"
+            permissions:
+              - "Overall/Administer"
+            entries:
+              - user: "admin"
+tool:
+  maven:
+    installations:
+      - name: "Maven 3.8.5"
+        properties:
+          - installSource:
+              installers:
+                - maven:
+                    id: "3.8.5" 
+jobs:
+  - file: /var/jenkins_home/init.groovy.d/job_dsl.groovy
