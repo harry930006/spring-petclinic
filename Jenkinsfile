@@ -113,4 +113,4 @@ pipenline {
     success { echo '🎉 Docker CI/CD 流程完美結束！' }
     failure { echo '❌ 流程失敗，請檢查看是 Maven 打包錯誤，還是 Docker 推送失敗。' }
     }
-
+}
