@@ -13,4 +13,4 @@ workflow-job
 workflow-cps
 workflow-scm-step
 git
-Pipeline
+pipeline-model-definition

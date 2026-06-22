@@ -4,7 +4,7 @@ pipeline {
         maven "Maven 3.8.5"
         jdk "JDK 17"
     }
-    enviroment {
+    environment {
         // Email notification settings
         EMAIL_RECIPIENTS = 'harry930006@gmail.com' // Update with your email
         
