@@ -1,7 +1,53 @@
 services:
   jenkins:
-    build: .
+    user: root # 以 root 身份運行 Jenkins，允許安裝插件和執行 Docker 命令
+    build: 
+      context: .
+      dockerfile: jenkins/Dockerfile
+    container_name: jenkins-server
     ports:
       - "8080:8080"
     environment:
       - CASC_JENKINS_CONFIG=/var/jenkins_casc_configs/jenkins.yaml
+      - TEST_SERVER="172.28.0.6"
+      - PROD_SERVER="172.28.0.7"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock # 讓 Jenkins 可以 Build/Push Image
+      - /usr/bin/docker:/usr/bin/docker # 共享宿主機的 docker 指令
+    networks:
+      simulation:
+        ipv4_address: "172.28.0.5"
+  test-environment:
+    build:
+      context: .
+      dockerfile: test_environment/Dockerfile
+    container_name: test-environment
+    ports:
+      - "8082:8082"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # 讓測試環境也能使用 Docker
+      - /usr/bin/docker:/usr/bin/docker # 共享宿主機的 docker 指令
+    networks:
+      simulation:
+        ipv4_address: "172.28.0.6"
+  release-environment:
+    build:
+      context: .
+      dockerfile: release_environment/Dockerfile
+    ports:
+      - "8083:8083"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # 讓釋出環境也能使用 Docker
+      - /usr/bin/docker:/usr/bin/docker # 共享宿主機的 docker 指令
+    networks:
+      simulation:
+        ipv4_address: "172.28.0.7"
+networks:
+  simulation:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+volumes:
+  jenkins_home:

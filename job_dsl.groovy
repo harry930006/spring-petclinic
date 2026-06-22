@@ -1,17 +1,15 @@
 def giturl = "https://github.com/spring-projects/spring-petclinic.git"
 def email = "harry930006@gmail.com"
-freeStyleJob("spring-petclinic") {
-    displayName("Spring Petclinic")
-    scm {
-        git {
-            remote {
-                url("$giturl")
-            }
-            branch("*/main")
-        }
+pipelineJob("spring-petclinic") {
+    displayName("CICD Pipeline for Spring Petclinic")
+    properties {
+        githubProjectUrl("$giturl")
     }
+
     triggers {
         scm('@daily')
+        // GitHub webhook trigger
+        githubPush()
     }
     logRotator {
         daysToKeep(10)
@@ -19,25 +17,20 @@ freeStyleJob("spring-petclinic") {
         artifactNumToKeep(10)
         artifactDaysToKeep(10)
     }
-    steps {
-        maven {
-            mavenInstallation("Maven 3.8.5")
-            goals("clean package")
-        }
-    }
-    publishers {
-        archiveArtifacts("target/*.jar")
-        extendedEmail {
-            recipientList("$email")
-            defaultSubject('Oops')
-            defaultContent('Something broken')  
-            triggers {
-                failure {
-                    sendTo {
-                        recipientList("$email")
+    definition {
+        cpsScm {
+            scm {
+                git {
+                    remote {
+                        url("$giturl")
+                    }
+                    branches("*/main")
+                    extensions {
+                        cleanBeforeCheckout()
                     }
                 }
-            }     
+            }
+            scriptPath("Jenkinsfile")
         }
     }
 } 

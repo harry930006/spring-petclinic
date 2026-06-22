@@ -16,6 +16,17 @@ jenkins:
               - "Overall/Administer"
             entries:
               - user: "admin"
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - usernamePassword:
+              id: "docker-hub-credentials"
+              description: "Docker Hub Credentials"
+              username: "${docker-hub-username}"
+              password: "${docker-hub-password}"
+
+
 tool:
   maven:
     installations:
@@ -25,5 +36,9 @@ tool:
               installers:
                 - maven:
                     id: "3.8.5" 
+  jdk:
+    installations:
+      - name: "JDK 17"
+        home: "/opt/java/openjdk" 
 jobs:
   - file: /var/jenkins_home/init.groovy.d/job_dsl.groovy
