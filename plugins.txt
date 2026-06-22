@@ -10,3 +10,6 @@ role-strategy
 ws-cleanup
 email-ext
 workflow-job
+workflow-cps
+workflow-scm-step
+git

@@ -1,4 +1,4 @@
-def giturl = "https://github.com/spring-projects/spring-petclinic.git"
+def giturl = "https://github.com/harry930006/spring-petclinic.git"
 def email = "harry930006@gmail.com"
 pipelineJob("spring-petclinic") {
     displayName("CICD Pipeline for Spring Petclinic")

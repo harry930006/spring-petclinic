@@ -41,4 +41,4 @@ tool:
       - name: "JDK 17"
         home: "/opt/java/openjdk" 
 jobs:
-  - file: /var/jenkins_home/init.groovy.d/job_dsl.groovy
+  - file: /var/jenkins_casc_configs/job_dsl.groovy

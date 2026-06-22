@@ -2,7 +2,7 @@ pipenline {
     agent any
     tools {
         maven "Maven 3.8.5"
-        JDK "JDK 17"
+        jdk "JDK 17"
     }
     enviroment {
         // Email notification settings
