@@ -1,5 +1,4 @@
-# 1. 使用官方輕量級的 Java 17 執行環境作為基底
-FROM eclipse-temurin:17-jre-alpine
+FROM amazoncorretto:17-alpine-jdk
 
 # 2. 設定容器內的工作目錄
 WORKDIR /app
