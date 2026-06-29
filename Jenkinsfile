@@ -38,7 +38,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     echo '=== 登入 Docker Hub ==='
-                    sh 'echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin'
+                    sh "echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin"
                     echo '=== 開始建立 Docker 映像檔 ==='
                     sh "docker build -t ${IMAGE_NAME}:build-${BUILD_NUMBER} ."
                     echo '=== 推送 Docker 映像檔到註冊中心 ==='
