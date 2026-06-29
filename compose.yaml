@@ -16,6 +16,7 @@ services:
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock # 讓 Jenkins 可以 Build/Push Image
+      - ssh_key_share:/root/.ssh
     networks:
       simulation:
         ipv4_address: "172.28.0.5"
@@ -41,6 +42,19 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # 讓釋出環境也能使用 Docker
       - /usr/bin/docker:/usr/bin/docker # 共享宿主機的 docker 指令
+      - ssh_key_share:/root/.ssh_share
+    entrypoint: |
+      /bin/bash -c "
+      mkdir -p /var/run/sshd /root/.ssh &&
+      chmod 700 /root/.ssh &&
+      echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config &&
+      echo 'PubkeyAuthentication yes' >> /etc/ssh/sshd_config &&
+      while [ ! -f /root/.ssh_share/id_rsa.pub ]; do sleep 1; done;
+      cat /root/.ssh_share/id_rsa.pub > /root/.ssh/authorized_keys &&
+      chmod 600 /root/.ssh/authorized_keys &&
+      /usr/sbin/sshd -D
+      "
+
     networks:
       simulation:
         ipv4_address: "172.28.0.7"
@@ -52,3 +66,4 @@ networks:
         - subnet: 172.28.0.0/16
 volumes:
   jenkins_home:
+  ssh_key_share:

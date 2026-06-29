@@ -59,7 +59,7 @@ pipeline {
                 sh """
                     ssh ${TEST_SERVER} "
                         # 1. 登入私有倉庫（確保有權限拉取 Image)
-                        docker login ${REGISTRY_URL} -u ${docker-hub-username} -p ${docker-hub-password}
+                        docker login ${REGISTRY_URL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
                         
                         # 2. 停止並刪除舊的容器（若不存在則忽略，避免錯誤中斷）
                         docker stop ${APP_NAME} || true
@@ -83,7 +83,7 @@ pipeline {
         }
         stage("部署到生產環境") {
             when {
-                branch "main"
+                branch "origin/main"
             }
              steps {
                 echo "【生產環境】通知生產伺服器汰換容器..."
@@ -92,7 +92,7 @@ pipeline {
                 sh """
                     ssh ${PROD_SERVER} "
                         # 1. 登入私有倉庫（確保有權限拉取 Image)
-                        docker login ${REGISTRY_URL} -u test_user -p test_password
+                        docker login ${REGISTRY_URL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
                         
                         # 2. 停止並刪除舊的容器（若不存在則忽略，避免錯誤中斷）
                         docker stop ${APP_NAME} || true
