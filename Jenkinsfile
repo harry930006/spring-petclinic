@@ -18,7 +18,9 @@ pipeline {
 
 
     }
-
+    parameters {
+        string(name: "branch", defaultValue: "main", description: "Branch to build and deploy")
+    }
     stages {
         stage('Checkout 原始碼') {
             steps {
@@ -34,17 +36,21 @@ pipeline {
         }
         stage("建立並推送 Docker 映像檔") {
             steps {
-                echo '=== 開始建立 Docker 映像檔 ==='
-                sh "docker build -t ${IMAGE_NAME}:build-${BUILD_NUMBER} ."
-                echo '=== 推送 Docker 映像檔到註冊中心 ==='
-                sh "docker push ${IMAGE_NAME}:build-${BUILD_NUMBER}"
-                // 3. 清理 Jenkins 本地剛剛建立的暫存映像檔，節約硬碟空間
-                sh "docker rmi ${IMAGE_NAME}:build-${BUILD_NUMBER}"
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'docker-hub-username', passwordVariable: 'docker-hub-password')]) {
+                    echo '=== 登入 Docker Hub ==='
+                    sh "docker login ${REGISTRY_URL} -u ${docker-hub-username} -p ${docker-hub-password}"
+                    echo '=== 開始建立 Docker 映像檔 ==='
+                    sh "docker build -t ${IMAGE_NAME}:build-${BUILD_NUMBER} ."
+                    echo '=== 推送 Docker 映像檔到註冊中心 ==='
+                    sh "docker push ${IMAGE_NAME}:build-${BUILD_NUMBER}"
+                    // 3. 清理 Jenkins 本地剛剛建立的暫存映像檔，節約硬碟空間
+                    sh "docker rmi ${IMAGE_NAME}:build-${BUILD_NUMBER}"
+                }
             }
         }
         stage("部署到測試環境") {
             when {
-                branch "develop"
+                branch "test"
             }
             steps {
                 echo "【測試環境】通知測試伺服器汰換容器..."
