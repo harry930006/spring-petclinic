@@ -89,7 +89,7 @@ pipeline {
                 echo "【生產環境】通知生產伺服器汰換容器..."
                 
                 // 透過 SSH 隔空對生產伺服器下達 Docker 指令
-                sh """
+                sh '''
                     ssh ${PROD_SERVER} "
                         # 1. 登入私有倉庫（確保有權限拉取 Image)
                         docker login ${REGISTRY_URL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
@@ -110,7 +110,7 @@ pipeline {
                         # 5. 清理伺服器上沒在使用的舊映像檔（標籤為 <none> 的遺留檔案）
                         docker image prune -f
                     "
-                """
+                '''
                 echo '【正式環境】Docker 部署成功！'
             }
         }
