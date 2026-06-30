@@ -41,7 +41,7 @@ services:
       - "8083:8083"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # 讓釋出環境也能使用 Docker
-      - /usr/bin/docker:/usr/bin/docker # 共享宿主機的 docker 指令
+      # - /usr/bin/docker:/usr/bin/docker # 共享宿主機的 docker 指令
       - ssh_key_share:/root/.ssh_share
     entrypoint: |
       /bin/bash -c "
