@@ -104,7 +104,7 @@ pipeline {
                         # 4. 啟動新容器：
                         # 結尾注入參數：指定為 production 環境設定
                         docker run -d --name ${APP_NAME} \
-                          -p 8082:8080 \
+                          -p 8085:8080 \
                           ${IMAGE_NAME}:build-${BUILD_NUMBER} --spring.profiles.active=prod
                           
                         # 5. 清理伺服器上沒在使用的舊映像檔（標籤為 <none> 的遺留檔案）
