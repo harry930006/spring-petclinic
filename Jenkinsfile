@@ -91,23 +91,21 @@ pipeline {
                 // 透過 SSH 隔空對生產伺服器下達 Docker 指令
                 sh '''
                     ssh root@$PROD_SERVER "
-                        # 1. 登入私有倉庫（確保有權限拉取 Image)
-                        docker login ${REGISTRY_URL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
-                        
-                        # 2. 停止並刪除舊的容器（若不存在則忽略，避免錯誤中斷）
+
+                        # 停止並刪除舊的容器（若不存在則忽略，避免錯誤中斷）
                         docker stop ${APP_NAME} || true
                         docker rm ${APP_NAME} || true
                         
-                        # 3. 從倉庫拉取剛剛 Jenkins 做好推上去的那顆精準版本 Image
+                        # 從倉庫拉取剛剛 Jenkins 做好推上去的那顆精準版本 Image
                         docker pull ${IMAGE_NAME}:build-${BUILD_NUMBER}
                         
-                        # 4. 啟動新容器：
+                        # 啟動新容器：
                         # 結尾注入參數：指定為 production 環境設定
                         docker run -d --name ${APP_NAME} \
                           -p 8085:8080 \
                           ${IMAGE_NAME}:build-${BUILD_NUMBER} --spring.profiles.active=prod
                           
-                        # 5. 清理伺服器上沒在使用的舊映像檔（標籤為 <none> 的遺留檔案）
+                        # 清理伺服器上沒在使用的舊映像檔（標籤為 <none> 的遺留檔案）
                         docker image prune -f
                     "
                 '''
