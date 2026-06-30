@@ -9,8 +9,8 @@ services:
       - "8080:8080"
     environment:
       - CASC_JENKINS_CONFIG=/var/jenkins_casc_configs/jenkins.yaml
-      - TEST_SERVER="172.28.0.6"
-      - PROD_SERVER="172.28.0.7"
+      - TEST_SERVER=172.28.0.6
+      - PROD_SERVER=172.28.0.7
       - docker-hub-username=${DOCKER_USER}
       - docker-hub-password=${DOCKER_PASS}
     volumes:

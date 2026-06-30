@@ -90,7 +90,7 @@ pipeline {
                 
                 // 透過 SSH 隔空對生產伺服器下達 Docker 指令
                 sh '''
-                    ssh ${PROD_SERVER} "
+                    ssh root@$PROD_SERVER "
                         # 1. 登入私有倉庫（確保有權限拉取 Image)
                         docker login ${REGISTRY_URL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
                         
