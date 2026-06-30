@@ -82,9 +82,9 @@ pipeline {
             }
         }
         stage("部署到生產環境") {
-            when {
-                branch pattern: ".*main", comparator: "REGEXP"
-            }
+            // when {
+            //     branch pattern: ".*main", comparator: "REGEXP"
+            // }
              steps {
                 echo "【生產環境】通知生產伺服器汰換容器..."
                 
