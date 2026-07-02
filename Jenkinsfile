@@ -60,26 +60,26 @@ pipeline {
                 echo "【測試環境】通知測試伺服器汰換容器..."
                 
                 // 透過 SSH 隔空對測試伺服器下達 Docker 指令
-                 sh '''
-                    ssh root@$TEST_SERVER "
+                 sh """
+                    ssh root@\$TEST_SERVER "
 
                         # 停止並刪除舊的容器（若不存在則忽略，避免錯誤中斷）
-                        docker stop ${APP_NAME} || true
-                        docker rm ${APP_NAME} || true
+                        docker stop \${APP_NAME} || true
+                        docker rm \${APP_NAME} || true
                         
                         # 從倉庫拉取剛剛 Jenkins 做好推上去的那顆精準版本 Image
-                        docker pull ${IMAGE_NAME}:build-${env.gitCommit}
+                        docker pull \${IMAGE_NAME}:build-${env.gitCommit}
                         
                         # 啟動新容器：
                         # 結尾注入參數：指定為 production 環境設定
-                        docker run -d --name ${APP_NAME} \
+                        docker run -d --name \${APP_NAME} \\
                           -p 8086:8080 \
-                          ${IMAGE_NAME}:build-${env.gitCommit} --spring.profiles.active=prod
+                          \${IMAGE_NAME}:build-${env.gitCommit} --spring.profiles.active=prod
                           
                         # 清理伺服器上沒在使用的舊映像檔（標籤為 <none> 的遺留檔案）
                         docker image prune -f
                     "
-                '''
+                """
                 echo '【測試環境】Docker 部署成功！'
             }
         }
@@ -91,26 +91,26 @@ pipeline {
                 echo "【生產環境】通知生產伺服器汰換容器..."
                 
                 // 透過 SSH 隔空對生產伺服器下達 Docker 指令
-                sh '''
-                    ssh root@$PROD_SERVER "
+                 sh """
+                    ssh root@\$TEST_SERVER "
 
                         # 停止並刪除舊的容器（若不存在則忽略，避免錯誤中斷）
-                        docker stop ${APP_NAME} || true
-                        docker rm ${APP_NAME} || true
+                        docker stop \${APP_NAME} || true
+                        docker rm \${APP_NAME} || true
                         
                         # 從倉庫拉取剛剛 Jenkins 做好推上去的那顆精準版本 Image
-                        docker pull ${IMAGE_NAME}:build-${env.gitCommit}
+                        docker pull \${IMAGE_NAME}:build-${env.gitCommit}
                         
                         # 啟動新容器：
                         # 結尾注入參數：指定為 production 環境設定
-                        docker run -d --name ${APP_NAME} \
+                        docker run -d --name \${APP_NAME} \\
                           -p 8085:8080 \
-                          ${IMAGE_NAME}:build-${env.gitCommit} --spring.profiles.active=prod
+                          \${IMAGE_NAME}:build-${env.gitCommit} --spring.profiles.active=prod
                           
                         # 清理伺服器上沒在使用的舊映像檔（標籤為 <none> 的遺留檔案）
                         docker image prune -f
                     "
-                '''
+                """
                 echo '【正式環境】Docker 部署成功！'
             }
         }
