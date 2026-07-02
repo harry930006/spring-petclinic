@@ -15,6 +15,7 @@ pipeline {
         APP_NAME = "spring-petclinic"
         REGISTRY_URL = "harry930006" // Update with your Docker registry URL
         IMAGE_NAME = "${REGISTRY_URL}/${APP_NAME}"
+        gitCommit = ""
 
 
     }
@@ -37,7 +38,7 @@ pipeline {
         stage("建立並推送 Docker 映像檔") {
             steps {
                 script {
-                        def gitCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                        gitCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
                         echo '=== 登入 Docker Hub ==='
                         sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
