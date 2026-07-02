@@ -50,40 +50,38 @@ pipeline {
         }
         stage("部署到測試環境") {
             when {
-                ${BRANCH} == "test"
+                expression { params.BRANCH == 'test' }
             }
             steps {
                 echo "【測試環境】通知測試伺服器汰換容器..."
                 
                 // 透過 SSH 隔空對測試伺服器下達 Docker 指令
-                sh """
-                    ssh ${TEST_SERVER} "
-                        # 1. 登入私有倉庫（確保有權限拉取 Image)
-                        docker login ${REGISTRY_URL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
-                        
-                        # 2. 停止並刪除舊的容器（若不存在則忽略，避免錯誤中斷）
+                 sh '''
+                    ssh root@$TEST_SERVER "
+
+                        # 停止並刪除舊的容器（若不存在則忽略，避免錯誤中斷）
                         docker stop ${APP_NAME} || true
                         docker rm ${APP_NAME} || true
                         
-                        # 3. 從倉庫拉取剛剛 Jenkins 做好推上去的那顆精準版本 Image
+                        # 從倉庫拉取剛剛 Jenkins 做好推上去的那顆精準版本 Image
                         docker pull ${IMAGE_NAME}:build-${BUILD_NUMBER}
                         
-                        # 4. 啟動新容器：
-                        # 結尾注入參數：指定為 test 環境設定
+                        # 啟動新容器：
+                        # 結尾注入參數：指定為 production 環境設定
                         docker run -d --name ${APP_NAME} \
-                          -p 8080:8080 \
-                          ${IMAGE_NAME}:build-${BUILD_NUMBER} --spring.profiles.active=test
+                          -p 8085:8080 \
+                          ${IMAGE_NAME}:build-${BUILD_NUMBER} --spring.profiles.active=prod
                           
-                        # 5. 清理伺服器上沒在使用的舊映像檔（標籤為 <none> 的遺留檔案）
+                        # 清理伺服器上沒在使用的舊映像檔（標籤為 <none> 的遺留檔案）
                         docker image prune -f
                     "
-                """
+                '''
                 echo '【測試環境】Docker 部署成功！'
             }
         }
         stage("部署到生產環境") {
             when {
-                ${BRANCH} == "main"
+                expression { params.BRANCH == 'main' }
             }
              steps {
                 echo "【生產環境】通知生產伺服器汰換容器..."
