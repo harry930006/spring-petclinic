@@ -19,7 +19,7 @@ pipeline {
 
     }
     parameters {
-        string(name: "branch", defaultValue: "main", description: "Branch to build and deploy")
+        string(name: "BRANCH", defaultValue: "", description: "Branch to build and deploy(e.g., main, test)")
     }
     stages {
         stage('Checkout 原始碼') {
@@ -50,7 +50,7 @@ pipeline {
         }
         stage("部署到測試環境") {
             when {
-                branch "test"
+                ${BRANCH} == "test"
             }
             steps {
                 echo "【測試環境】通知測試伺服器汰換容器..."
@@ -82,9 +82,9 @@ pipeline {
             }
         }
         stage("部署到生產環境") {
-            // when {
-            //     branch pattern: ".*main", comparator: "REGEXP"
-            // }
+            when {
+                ${BRANCH} == "main"
+            }
              steps {
                 echo "【生產環境】通知生產伺服器汰換容器..."
                 
