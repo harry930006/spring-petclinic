@@ -1,3 +1,4 @@
+def gitCommit = ""
 pipeline {
     agent any
     tools {
@@ -15,7 +16,6 @@ pipeline {
         APP_NAME = "spring-petclinic"
         REGISTRY_URL = "harry930006" // Update with your Docker registry URL
         IMAGE_NAME = "${REGISTRY_URL}/${APP_NAME}"
-        gitCommit = ""
 
 
     }
@@ -38,16 +38,16 @@ pipeline {
         stage("建立並推送 Docker 映像檔") {
             steps {
                 script {
-                        env.gitCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                        gitCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
                         echo '=== 登入 Docker Hub ==='
                         sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
                         echo '=== 開始建立 Docker 映像檔 ==='
-                        sh "docker build -t ${IMAGE_NAME}:build-${env.gitCommit} ."
+                        sh "docker build -t ${IMAGE_NAME}:build-${gitCommit} ."
                         echo '=== 推送 Docker 映像檔到註冊中心 ==='
-                        sh "docker push ${IMAGE_NAME}:build-${env.gitCommit}"
+                        sh "docker push ${IMAGE_NAME}:build-${gitCommit}"
                         // 3. 清理 Jenkins 本地剛剛建立的暫存映像檔，節約硬碟空間
-                        sh "docker rmi ${IMAGE_NAME}:build-${env.gitCommit}"
+                        sh "docker rmi ${IMAGE_NAME}:build-${gitCommit}"
                     }
                 }    
             }
@@ -74,7 +74,7 @@ pipeline {
                         # 結尾注入參數：指定為 production 環境設定
                         docker run -d --name \${APP_NAME} \\
                           -p 8086:8080 \
-                          \${IMAGE_NAME}:build-${env.gitCommit} --spring.profiles.active=prod
+                          \${IMAGE_NAME}:build-\${gitCommit} --spring.profiles.active=prod
                           
                         # 清理伺服器上沒在使用的舊映像檔（標籤為 <none> 的遺留檔案）
                         docker image prune -f
@@ -99,13 +99,13 @@ pipeline {
                         docker rm \${APP_NAME} || true
                         
                         # 從倉庫拉取剛剛 Jenkins 做好推上去的那顆精準版本 Image
-                        docker pull \${IMAGE_NAME}:build-${env.gitCommit}
+                        docker pull \${IMAGE_NAME}:build-\${gitCommit}
                         
                         # 啟動新容器：
                         # 結尾注入參數：指定為 production 環境設定
                         docker run -d --name \${APP_NAME} \\
                           -p 8085:8080 \
-                          \${IMAGE_NAME}:build-${env.gitCommit} --spring.profiles.active=prod
+                          \${IMAGE_NAME}:build-\${gitCommit} --spring.profiles.active=prod
                           
                         # 清理伺服器上沒在使用的舊映像檔（標籤為 <none> 的遺留檔案）
                         docker image prune -f
