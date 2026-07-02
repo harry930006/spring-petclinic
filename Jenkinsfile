@@ -92,7 +92,7 @@ pipeline {
                 
                 // 透過 SSH 隔空對生產伺服器下達 Docker 指令
                  sh """
-                    ssh root@\$TEST_SERVER "
+                    ssh root@\$PROD_SERVER "
 
                         # 停止並刪除舊的容器（若不存在則忽略，避免錯誤中斷）
                         docker stop \${APP_NAME} || true
