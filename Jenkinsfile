@@ -26,7 +26,7 @@ pipeline {
         stage('Checkout 原始碼') {
             steps {
                 echo '====== Checking out code from repository ======'
-                checkout scm
+                git branch: 'main', url: 'https://github.com/harry930006/spring-petclinic.git'
             }
         }
         stage("maven build 編譯打包") {
@@ -64,15 +64,15 @@ pipeline {
                     ssh root@\$TEST_SERVER "
 
                         # 停止並刪除舊的容器（若不存在則忽略，避免錯誤中斷）
-                        docker stop \${APP_NAME} || true
-                        docker rm \${APP_NAME} || true
+                        docker stop \${APP_NAME}_test || true
+                        docker rm \${APP_NAME}_test || true
                         
                         # 從倉庫拉取剛剛 Jenkins 做好推上去的那顆精準版本 Image
                         docker pull \${IMAGE_NAME}:build-${gitCommit}
                         
                         # 啟動新容器：
                         # 結尾注入參數：指定為 production 環境設定
-                        docker run -d --name \${APP_NAME} \\
+                        docker run -d --name \${APP_NAME}_test \\
                           -p 8086:8080 \
                           \${IMAGE_NAME}:build-${gitCommit} --spring.profiles.active=prod
                           
@@ -95,15 +95,15 @@ pipeline {
                     ssh root@\$PROD_SERVER "
 
                         # 停止並刪除舊的容器（若不存在則忽略，避免錯誤中斷）
-                        docker stop \${APP_NAME} || true
-                        docker rm \${APP_NAME} || true
+                        docker stop \${APP_NAME}_prod || true
+                        docker rm \${APP_NAME}_prod || true
                         
                         # 從倉庫拉取剛剛 Jenkins 做好推上去的那顆精準版本 Image
                         docker pull \${IMAGE_NAME}:build-${gitCommit}
                         
                         # 啟動新容器：
                         # 結尾注入參數：指定為 production 環境設定
-                        docker run -d --name \${APP_NAME} \\
+                        docker run -d --name \${APP_NAME}_prod \\
                           -p 8085:8080 \
                           \${IMAGE_NAME}:build-${gitCommit} --spring.profiles.active=prod
                           

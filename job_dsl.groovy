@@ -18,19 +18,10 @@ pipelineJob("spring-petclinic") {
         artifactDaysToKeep(10)
     }
     definition {
-        cpsScm {
-            scm {
-                git {
-                    remote {
-                        url("$giturl")
-                    }
-                    branches("*/main")
-                    extensions {
-                        cleanBeforeCheckout()
-                    }
-                }
-            }
-            scriptPath("Jenkinsfile")
+        cps {
+            // 💡 移除 readFileFromWorkspace，改用 new File().text
+            script(new File('/var/jenkins_casc_configs/Jenkinsfile').text)
+            sandbox(true)
         }
     }
 } 
